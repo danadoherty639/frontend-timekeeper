@@ -1,0 +1,27 @@
+{
+  "accounts": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "branch": "Downtown",
+      "balance": 1000
+    },
+    {
+      "id": 2,
+      "name": "Alice Smith",
+      "branch": "Uptown",
+      "balance": 5000
+    },
+    {
+      "id": 3,
+      "name": "Bob Johnson",
+      "balance": 2500
+    },
+    {
+      "id": 4,
+      "name": "Maria Garcia",
+      "branch": "Downtown",
+      "balance": 4300
+    }
+  ]
+}
