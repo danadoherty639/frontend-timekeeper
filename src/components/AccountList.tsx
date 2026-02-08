@@ -1,25 +1,27 @@
+import { useState } from 'react';
 import type { Account } from '../types';
+import { useAccounts } from '../hooks/useAccounts';
 
 interface AccountListProps {
-    accounts: Account[];
     selectedAccountId?: number;
     onSelectAccount: (account: Account) => void;
 }
 
 const AccountList = ({
-    accounts,
     selectedAccountId,
     onSelectAccount,
 }: AccountListProps) => {
+    const {data : accounts, isLoading, error } = useAccounts();
+
     return (
         <div>
             <h2 className="text-lg font-semibold mb-4">Accounts</h2>
 
-            {accounts.length === 0 ? (
+            {!isLoading && accounts?.length === 0 ? (
                 <p className="text-gray-500">No accounts found</p>
             ) : (
                 <ul className="space-y-2">
-                    {accounts.map((account) => (
+                    {accounts?.map((account) => (
                         <li key={account.id}>
                             <button
                                 onClick={() => onSelectAccount(account)}

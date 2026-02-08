@@ -1,10 +1,14 @@
 import type { Account } from '../types';
+import { useDeleteAccount } from '../hooks/useAccounts';
+import toast from 'react-hot-toast';
 
 interface AccountDetailsProps {
-    account: Account | null;
+    account: Account | undefined;
+    onClearSelection: () => void;
 }
 
-const AccountDetails = ({ account }: AccountDetailsProps) => {
+const AccountDetails = ({ account, onClearSelection }: AccountDetailsProps) => {
+    const deleteAccount = useDeleteAccount();
     if (!account) {
         return (
             <div className="text-gray-500">
@@ -13,10 +17,21 @@ const AccountDetails = ({ account }: AccountDetailsProps) => {
         );
     }
 
+    const handleDeleteAccount = (id: number) => {
+        deleteAccount.mutate(id, {
+            onSuccess: () => {
+                onClearSelection()
+            },
+            onError: (error) => {
+                toast.error(`Failed to delete account: ${error.message}`)
+            }
+        })
+    }
+
     return (
         <div>
             <h2 className="text-lg font-semibold mb-4">Account Details</h2>
-
+               <button className="fixed right-0 mr-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" onClick={() => handleDeleteAccount(account.id)}>Delete Account</button>
             <div className="space-y-2">
                 <p>
                     <span className="font-medium">Name:</span> {account.name}

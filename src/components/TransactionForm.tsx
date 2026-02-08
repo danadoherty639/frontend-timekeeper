@@ -1,20 +1,44 @@
+import { useState } from "react";
+import { UpdateAccountData } from "../types";
+import { useAccount, useUpdateAccount } from "../hooks/useAccounts";
+
 interface TransactionFormProps {
-    currentBalance: number;
-    onDeposit: (amount: number) => void;
-    onWithdraw: (amount: number) => void;
+    selectedAccountId: number;
 }
 
 const TransactionForm = ({
-    currentBalance,
-    onDeposit,
-    onWithdraw,
+    selectedAccountId,
 }: TransactionFormProps) => {
+    const [amount, setAmount] = useState('')
+    const updateAccount = useUpdateAccount();
+     const { data: account, isLoading } = useAccount(selectedAccountId);
+    
+    if (isLoading) return <div>Loading...</div>;
+    if (!account) return null;
+
     const handleDeposit = () => {
-        onDeposit(0);
+
+        const updatedAccount : UpdateAccountData = {
+            balance: account.balance + parseInt(amount)
+        }
+
+        updateAccount.mutate(({ id: selectedAccountId, data: updatedAccount}), {
+            onSuccess: () => {
+                setAmount('')
+            }
+        });
     };
 
     const handleWithdraw = () => {
-        onWithdraw(0);
+        const updatedAccount : UpdateAccountData = {
+            balance: account.balance - parseInt(amount)
+        }
+
+           updateAccount.mutate(({ id: selectedAccountId, data: updatedAccount}), {
+            onSuccess: () => {
+                setAmount('')
+            }
+        });
     };
 
     return (
@@ -22,7 +46,7 @@ const TransactionForm = ({
             <h3 className="text-md font-semibold mb-3">Make a Transaction</h3>
 
             <p className="text-sm text-gray-600 mb-3">
-                Current Balance: £{currentBalance.toFixed(2)}
+                Current Balance: £{account.balance.toFixed(2)}
             </p>
 
             <div className="space-y-3">
@@ -39,6 +63,8 @@ const TransactionForm = ({
                         min="0.01"
                         step="0.01"
                         placeholder="0.00"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
                         className="w-full border rounded p-2"
                     />
                 </div>

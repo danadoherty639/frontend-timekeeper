@@ -1,38 +1,21 @@
+import { useState } from 'react';
 import type { Account } from './types';
 import AccountList from './components/AccountList';
 import AccountDetails from './components/AccountDetails';
 import AccountForm from './components/AccountForm';
 import TransactionForm from './components/TransactionForm';
+import { useAccount } from './hooks/useAccounts';
 
-const SAMPLE_ACCOUNTS: Account[] = [
-    { id: 1, name: 'John Doe', branch: 'Downtown', balance: 1000 },
-    { id: 2, name: 'Alice Smith', branch: 'Uptown', balance: 5000 },
-    { id: 3, name: 'Bob Johnson', balance: 2500 },
-];
+
 
 const App = () => {
-    const accounts: Account[] = SAMPLE_ACCOUNTS;
-    const selectedAccount: Account | null = SAMPLE_ACCOUNTS[0];
-    const showCreateForm = false;
+    const [selectedAccount, setSelectedAccount] = useState<Account | undefined>()
+    const [showCreateForm, setShowCreateAccountForm] = useState(false);
+     const { data: account, isLoading } = useAccount(selectedAccount?.id as number);
 
     const handleSelectAccount = (account: Account) => {
         console.log('Selected account:', account);
-    };
-
-    const handleCreateAccount = (data: {
-        name: string;
-        branch?: string;
-        balance: number;
-    }) => {
-        console.log('Create account:', data);
-    };
-
-    const handleDeposit = (amount: number) => {
-        console.log('Deposit:', amount);
-    };
-
-    const handleWithdraw = (amount: number) => {
-        console.log('Withdraw:', amount);
+        setSelectedAccount(account)
     };
 
     return (
@@ -40,7 +23,7 @@ const App = () => {
             <header className="bg-white border-b px-6 py-4">
                 <div className="flex justify-between items-center">
                     <h1 className="text-xl font-bold">TimeKeeper Bank</h1>
-                    <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" onClick={() => setShowCreateAccountForm(!showCreateForm)}>
                         + New Account
                     </button>
                 </div>
@@ -49,7 +32,6 @@ const App = () => {
             <main className="flex">
                 <aside className="w-64 bg-white border-r min-h-[calc(100vh-73px)] p-4">
                     <AccountList
-                        accounts={accounts}
                         selectedAccountId={selectedAccount?.id}
                         onSelectAccount={handleSelectAccount}
                     />
@@ -58,19 +40,18 @@ const App = () => {
                 <section className="flex-1 p-6">
                     {showCreateForm ? (
                         <AccountForm
-                            onSubmit={handleCreateAccount}
-                            onCancel={() => {}}
+                            // onSubmit={handleCreateAccount}
+                            onSelectAccount={handleSelectAccount}
+                            onCancel={() => setShowCreateAccountForm(!showCreateForm)}
                         />
                     ) : (
                         <div className="space-y-6">
-                            <AccountDetails account={selectedAccount} />
+                            <AccountDetails account={account}  onClearSelection={() => setSelectedAccount(undefined)}/>
 
                             {selectedAccount && (
                                 <div className="border-t pt-6">
                                     <TransactionForm
-                                        currentBalance={selectedAccount.balance}
-                                        onDeposit={handleDeposit}
-                                        onWithdraw={handleWithdraw}
+                                        selectedAccountId={selectedAccount.id}
                                     />
                                 </div>
                             )}

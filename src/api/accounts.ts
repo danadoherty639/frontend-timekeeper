@@ -22,7 +22,7 @@ export async function updateAccount(
     id: number,
     data: UpdateAccountData,
 ): Promise<Account> {
-    const response = await axios.put<Account>(
+    const response = await axios.patch<Account>(
         `${API_BASE}/accounts/${id}`,
         data,
     );

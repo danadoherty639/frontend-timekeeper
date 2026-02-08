@@ -1,17 +1,61 @@
+import { useState } from "react";
+import { useCreateAccount } from "../hooks/useAccounts";
+import { Account, CreateAccountData } from "../types";
+import toast from "react-hot-toast";
+
 interface AccountFormProps {
-    onSubmit: (data: { name: string; branch?: string; balance: number }) => void;
+    onSelectAccount: (account: Account ) => void;
     onCancel?: () => void;
 }
 
-const AccountForm = ({ onSubmit, onCancel }: AccountFormProps) => {
-    const handleSubmit = (e: React.FormEvent) => {
+const AccountForm = ({ onSelectAccount,onCancel }:  AccountFormProps) => {
+    const [name, setName] = useState('')
+    const [branch, setBranch] = useState('')
+    const [balance, setBalance] = useState('')
+    const [nameValidationError, setNameValidationError] = useState('')
+    const [balanceValidationError, setbalanceValidationError] = useState('')
+    const createAccount = useCreateAccount()
+
+    const handleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
-        onSubmit({ name: '', balance: 0 });
+
+        if (!name.trim()) {
+            setNameValidationError('Name is required');
+            return;
+        }
+
+        if (!balance || parseFloat(balance) < 0) {
+            setbalanceValidationError('Balance must be a positive number');
+            return;
+        }
+        const account : CreateAccountData = {
+            name,
+            branch,
+            balance: parseFloat(balance)
+        }
+        createAccount.mutate({data: account}, {
+            onSuccess: (newAccount) => {
+                setName('')
+                setBranch('')
+                setBalance('')
+                setNameValidationError('')
+                setbalanceValidationError('')
+
+                onCancel?.()
+
+                onSelectAccount(newAccount)
+                toast.success('Accoubt created scuccessfully')
+
+            },
+            onError: (error) => {
+                toast.error(`The following error occured: ${error.message}`)
+            }
+        })
     };
 
     return (
         <div>
-            <h2 className="text-lg font-semibold mb-4">Create Account</h2>
+            <h2 className="text-lg font-semibold mb-4" data-testid="create-account-testId">Create Account</h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -25,9 +69,14 @@ const AccountForm = ({ onSubmit, onCancel }: AccountFormProps) => {
                         type="text"
                         id="name"
                         name="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         required
+                        minLength={2}
                         className="w-full border rounded p-2"
+                        data-testid="customer-name-testId"
                     />
+                    <span className="bg-red-100">{nameValidationError}</span>
                 </div>
 
                 <div>
@@ -41,8 +90,12 @@ const AccountForm = ({ onSubmit, onCancel }: AccountFormProps) => {
                         type="text"
                         id="branch"
                         name="branch"
+                        value={branch}
+                        onChange={(e) => setBranch(e.target.value)}
                         className="w-full border rounded p-2"
+                        data-testid="customer-branch-testId"
                     />
+                    <span className="bg-red-100">{balanceValidationError}</span>
                 </div>
 
                 <div>
@@ -56,10 +109,13 @@ const AccountForm = ({ onSubmit, onCancel }: AccountFormProps) => {
                         type="number"
                         id="balance"
                         name="balance"
+                        value={balance}
+                        onChange={(e) => setBalance(e.target.value)}
                         min="0"
                         step="0.01"
                         defaultValue="0"
                         className="w-full border rounded p-2"
+                        data-testid="customer-balance-testId"
                     />
                 </div>
 
@@ -67,8 +123,9 @@ const AccountForm = ({ onSubmit, onCancel }: AccountFormProps) => {
                     <button
                         type="submit"
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                        disabled={!!nameValidationError || !!balanceValidationError || createAccount.isPending}
                     >
-                        Create Account
+                        {createAccount.isPending ? 'Creating Account' : 'Create Account'}
                     </button>
                     {onCancel && (
                         <button

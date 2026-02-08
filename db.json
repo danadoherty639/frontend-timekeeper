@@ -1,27 +1,51 @@
 {
   "accounts": [
     {
-      "id": 1,
-      "name": "John Doe",
-      "branch": "Downtown",
-      "balance": 1000
-    },
-    {
-      "id": 2,
+      "id": "2",
       "name": "Alice Smith",
       "branch": "Uptown",
       "balance": 5000
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Bob Johnson",
       "balance": 2500
     },
     {
-      "id": 4,
+      "id": "4",
       "name": "Maria Garcia",
       "branch": "Downtown",
       "balance": 4300
+    },
+    {
+      "id": "1c47",
+      "name": "Sarah",
+      "branch": "Halifax",
+      "balance": 2500
+    },
+    {
+      "id": "a670",
+      "name": "Tom",
+      "branch": "Uptown",
+      "balance": 5000
+    },
+    {
+      "id": "e266",
+      "name": "Mary",
+      "branch": "Uptown",
+      "balance": 8000
+    },
+    {
+      "id": "4eef",
+      "name": "John Smith",
+      "branch": "",
+      "balance": 5500
+    },
+    {
+      "id": "2e3f",
+      "name": "John Smith",
+      "branch": "",
+      "balance": 1100
     }
   ]
 }
