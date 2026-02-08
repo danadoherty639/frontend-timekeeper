@@ -13,19 +13,20 @@ const AccountForm = ({ onSelectAccount,onCancel }:  AccountFormProps) => {
     const [branch, setBranch] = useState('')
     const [balance, setBalance] = useState('')
     const [nameValidationError, setNameValidationError] = useState('')
-    const [balanceValidationError, setbalanceValidationError] = useState('')
+    const [balanceValidationError, setBalanceValidationError] = useState('')
     const createAccount = useCreateAccount()
 
     const handleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
 
+        console.log('hanlde submit', balance)
         if (!name.trim()) {
             setNameValidationError('Name is required');
             return;
         }
 
         if (!balance || parseFloat(balance) < 0) {
-            setbalanceValidationError('Balance must be a positive number');
+            setBalanceValidationError('Balance must be a positive number');
             return;
         }
         const account : CreateAccountData = {
@@ -39,7 +40,7 @@ const AccountForm = ({ onSelectAccount,onCancel }:  AccountFormProps) => {
                 setBranch('')
                 setBalance('')
                 setNameValidationError('')
-                setbalanceValidationError('')
+                setBalanceValidationError('')
 
                 onCancel?.()
 
@@ -70,13 +71,20 @@ const AccountForm = ({ onSelectAccount,onCancel }:  AccountFormProps) => {
                         id="name"
                         name="name"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) => {
+                            setName(e.target.value)
+                            if(nameValidationError && e.target.value) {
+                                setNameValidationError('');
+                            }
+                        }}
                         required
                         minLength={2}
                         className="w-full border rounded p-2"
                         data-testid="customer-name-testId"
                     />
-                    <span className="bg-red-100">{nameValidationError}</span>
+                    {nameValidationError && (
+                         <span className="bg-red-100">{nameValidationError}</span>
+                    )}
                 </div>
 
                 <div>
@@ -95,7 +103,6 @@ const AccountForm = ({ onSelectAccount,onCancel }:  AccountFormProps) => {
                         className="w-full border rounded p-2"
                         data-testid="customer-branch-testId"
                     />
-                    <span className="bg-red-100">{balanceValidationError}</span>
                 </div>
 
                 <div>
@@ -110,20 +117,28 @@ const AccountForm = ({ onSelectAccount,onCancel }:  AccountFormProps) => {
                         id="balance"
                         name="balance"
                         value={balance}
-                        onChange={(e) => setBalance(e.target.value)}
+                        onChange={(e) => {
+                            setBalance(e.target.value)
+                            if (balanceValidationError && e.target.value && parseFloat(e.target.value) >= 0) {
+                                setBalanceValidationError('');
+                            }
+                        }}
                         min="0"
                         step="0.01"
                         defaultValue="0"
                         className="w-full border rounded p-2"
                         data-testid="customer-balance-testId"
                     />
+                    {balanceValidationError && (
+                            <span className="bg-red-100">{balanceValidationError}</span>
+                    )}
                 </div>
 
                 <div className="flex gap-2">
                     <button
                         type="submit"
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                        disabled={!!nameValidationError || !!balanceValidationError || createAccount.isPending}
+                        disabled={createAccount.isPending}
                     >
                         {createAccount.isPending ? 'Creating Account' : 'Create Account'}
                     </button>
